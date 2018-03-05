@@ -1,21 +1,20 @@
 # FirebaseUI for iOS - customized
 Clone from the firebase repo and check in into this repo.
 
-    1. Create a new repository at github.com. (this is your repository)
-        Give it the same name as as the other repository.
-        Don't initialize it with a README, .gitignore, or license.
+    1. Created a new repository at github.com. (this is  your repository - https://github.com/ramjyroo/firebaseAuthUI-iOS-jyroo)
+       Don't initialize it with a README, .gitignore, or license.
 
     2. Clone the other repository to your local machine. (if you haven't done so already)
-	git clone https://github.com/firebase/FirebaseUI-iOS.git
+       git clone https://github.com/firebase/FirebaseUI-iOS.git
 
     3. Rename the local repository's current 'origin' to 'upstream'.
-        git remote rename origin upstream
+       git remote rename origin upstream
 
     4. Give the local repository an 'origin' that points to your repository.
-        git remote add origin https://github.com/ramjyroo/firebaseAuthUI-iOS-jyroo.git
+       git remote add origin https://github.com/ramjyroo/firebaseAuthUI-iOS-jyroo.git
 
     5. Push the local repository to your repository on github.
-        git push origin master
+       git push origin master
 	
        Now 'origin' points to your repository & 'upstream' points to the other repository.
 
@@ -33,9 +32,6 @@ Clone from the firebase repo and check in into this repo.
     pod 'FirebaseUI/Google', :path => '../firebaseAuthUI-iOS-jyroo'
     pod 'FirebaseUI/Phone', :path => '../firebaseAuthUI-iOS-jyroo'
     pod 'FirebaseUI/Twitter', :path => '../firebaseAuthUI-iOS-jyroo'
-
-
-
 
 # FirebaseUI for iOS — UI Bindings for Firebase [![Build Status](https://travis-ci.org/firebase/FirebaseUI-iOS.svg?branch=master)](https://travis-ci.org/firebase/FirebaseUI-iOS)
 
