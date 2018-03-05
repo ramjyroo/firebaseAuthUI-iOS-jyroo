@@ -24,6 +24,9 @@ NS_ASSUME_NONNULL_BEGIN
     @brief The view controller that displays sign in options to the user.
  */
 @interface FUIAuthPickerViewController : FUIAuthBaseViewController
+//To help customize the buttons
+- (void)signInWithEmail;
+- (void)didTapSignIn:(id<FUIAuthProvider>)providerUI;
 
 @end
 
