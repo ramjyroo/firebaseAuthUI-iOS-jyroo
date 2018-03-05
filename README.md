@@ -1,5 +1,5 @@
 # FirebaseUI for iOS - customized
-Clone from the firebase repo and check in into this repo.
+Steps to clone to firebase auth UI to a separate repo.
 
     1. Created a new repository at github.com. (this is  your repository - https://github.com/ramjyroo/firebaseAuthUI-iOS-jyroo)
        Don't initialize it with a README, .gitignore, or license.
@@ -21,6 +21,8 @@ Clone from the firebase repo and check in into this repo.
     Create a new branch for your changes with git checkout -b my-feature-branch.
     You can git commit as usual to your repository.
     Use *git pull upstream master* to pull changes from the other repository to your master branch.
+    
+    
     
     6. In the pod file - create development pods for this clone
     
