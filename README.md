@@ -1,6 +1,6 @@
 # FirebaseUI for iOS - customized
-GitHub: git clone someone else's repository & git push to your own repository
-I'm going to refer to someone else's repository as the other repository.
+Clone from the firebase repo and check in into this repo.
+
     1. Create a new repository at github.com. (this is your repository)
         Give it the same name as as the other repository.
         Don't initialize it with a README, .gitignore, or license.
