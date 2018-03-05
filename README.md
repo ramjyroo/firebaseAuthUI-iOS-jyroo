@@ -1,3 +1,42 @@
+# FirebaseUI for iOS - customized
+GitHub: git clone someone else's repository & git push to your own repository
+I'm going to refer to someone else's repository as the other repository.
+    1. Create a new repository at github.com. (this is your repository)
+        Give it the same name as as the other repository.
+        Don't initialize it with a README, .gitignore, or license.
+
+    2. Clone the other repository to your local machine. (if you haven't done so already)
+	git clone https://github.com/firebase/FirebaseUI-iOS.git
+
+    3. Rename the local repository's current 'origin' to 'upstream'.
+        git remote rename origin upstream
+
+    4. Give the local repository an 'origin' that points to your repository.
+        git remote add origin https://github.com/ramjyroo/firebaseAuthUI-iOS-jyroo.git
+
+    5. Push the local repository to your repository on github.
+        git push origin master
+	
+       Now 'origin' points to your repository & 'upstream' points to the other repository.
+
+    Create a new branch for your changes with git checkout -b my-feature-branch.
+    You can git commit as usual to your repository.
+    Use *git pull upstream master* to pull changes from the other repository to your master branch.
+    
+    6. In the pod file - create development pods for this clone
+    
+    pod 'FirebaseUI/Database', :path => '../firebaseAuthUI-iOS-jyroo'
+    pod 'FirebaseUI/Firestore', :path => '../firebaseAuthUI-iOS-jyroo'
+    pod 'FirebaseUI/Storage', :path => '../firebaseAuthUI-iOS-jyroo'
+    pod 'FirebaseUI/Auth', :path => '../firebaseAuthUI-iOS-jyroo'
+    pod 'FirebaseUI/Facebook', :path => '../firebaseAuthUI-iOS-jyroo'
+    pod 'FirebaseUI/Google', :path => '../firebaseAuthUI-iOS-jyroo'
+    pod 'FirebaseUI/Phone', :path => '../firebaseAuthUI-iOS-jyroo'
+    pod 'FirebaseUI/Twitter', :path => '../firebaseAuthUI-iOS-jyroo'
+
+
+
+
 # FirebaseUI for iOS — UI Bindings for Firebase [![Build Status](https://travis-ci.org/firebase/FirebaseUI-iOS.svg?branch=master)](https://travis-ci.org/firebase/FirebaseUI-iOS)
 
 FirebaseUI is an open-source library for iOS that allows you to quickly connect common UI elements to the [Firebase](https://firebase.google.com?utm_source=FirebaseUI-iOS) database for data storage, allowing views to be updated in realtime as they change, and providing simple interfaces for common tasks like displaying lists or collections of items.
