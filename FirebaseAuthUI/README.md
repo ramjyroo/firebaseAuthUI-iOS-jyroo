@@ -55,13 +55,12 @@ Auth guides at the following links:
 ### Configuration
 
 All operations, callbacks, UI customizations are done through an `FUIAuth`
-instance. The `FUIAuth` instance associated with the default `FIRAuth`
+instance. The `FUIAuth` instance associated with the default Firebase Auth
 instance can be accessed as follows:
 
 ```swift
 // Swift
-import Firebase
-import FirebaseAuthUI
+import FirebaseUI
 
 /* ... */
 
@@ -73,8 +72,7 @@ authUI?.delegate = self
 
 ```objective-c
 // Objective-C
-@import Firebase;
-@import FirebaseAuthUI;
+@import FirebaseUI;
 ...
 [FIRApp configure];
 FUIAuth *authUI = [FUIAuth defaultAuthUI];
@@ -86,27 +84,23 @@ This instance can then be configured with the providers you wish to support:
 
 ```swift
 // Swift
-import FirebaseGoogleAuthUI
-import FirebaseFacebookAuthUI
-import FirebaseTwitterAuthUI
-import FirebasePhoneAuthUI
+import FirebaseUI
 
 let providers: [FUIAuthProvider] = [
   FUIGoogleAuth(),
   FUIFacebookAuth(),
   FUITwitterAuth(),
-  FUIPhoneAuth(authUI:FUIAuth.defaultAuthUI()),
+  FUIPhoneAuth(authUI: FUIAuth.defaultAuthUI()),
 ]
 self.authUI?.providers = providers
 ```
 
 ```objective-c
 // Objective-C
-@import FirebaseGoogleAuthUI;
-@import FirebaseFacebookAuthUI;
-@import FirebaseTwitterAuthUI;
-@import FirebasePhoneAuthUI;
-...
+@import FirebaseUI;
+
+// ...
+
 NSArray<id<FUIAuthProvider>> *providers = @[
   [[FUIGoogleAuth alloc] init],
   [[FUIFacebookAuth alloc] init],
@@ -160,8 +154,8 @@ present the `authViewController` obtain as instance as follows:
 // Present the auth view controller and then implement the sign in callback.
 let authViewController = authUI!.authViewController()
 
-func authUI(_ authUI: FUIAuth, didSignInWith user: FIRUser?, error: Error?) {
-  // handle user and error as necessary
+func authUI(_ authUI: FUIAuth, didSignInWithAuthDataResult authDataResult: AuthDataResult?, error: Error?) {
+  // handle user (`authDataResult.user`) and error as necessary
 }
 ```
 
@@ -171,8 +165,10 @@ UINavigationController *authViewController = [authUI authViewController];
 // Use authViewController as your root view controller,
 // or present it on top of an existing view controller.
 
-- (void)authUI:(FUIAuth *)authUI didSignInWithUser:(nullable FIRUser *)user error:(nullable NSError *)error {
-  // Implement this method to handle signed in user or error if any.
+- (void)authUI:(FUIAuth *)authUI
+    didSignInWithAuthDataResult:(nullable FIRAuthDataResult *)authDataResult
+         error:(nullable NSError *)error {
+  // Implement this method to handle signed in user (`authDataResult.user`) or error if any.
 }
 ```
 

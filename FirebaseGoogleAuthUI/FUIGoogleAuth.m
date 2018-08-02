@@ -55,6 +55,11 @@ static NSString *const kSignInWithGoogle = @"SignInWithGoogle";
       @brief The callback which should be invoked when the sign in flow completes (or is cancelled.)
    */
   FIRAuthProviderSignInCompletionBlock _pendingSignInCallback;
+
+  /** @var _email
+      @brief The email address associated with this account.
+   */
+  NSString *_email;
 }
 
 - (instancetype)init {
@@ -103,6 +108,8 @@ static NSString *const kSignInWithGoogle = @"SignInWithGoogle";
   return [UIColor colorWithWhite:0 alpha:0.54f];
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
 - (void)signInWithEmail:(nullable NSString *)email
     presentingViewController:(nullable UIViewController *)presentingViewController
                   completion:(nullable FIRAuthProviderSignInCompletionBlock)completion {
@@ -110,6 +117,7 @@ static NSString *const kSignInWithGoogle = @"SignInWithGoogle";
       presentingViewController:presentingViewController
                     completion:completion];
 }
+#pragma clang diagnostic pop
 
 - (void)signInWithDefaultValue:(nullable NSString *)defaultValue
       presentingViewController:(nullable UIViewController *)presentingViewController
@@ -140,6 +148,10 @@ static NSString *const kSignInWithGoogle = @"SignInWithGoogle";
   return [signIn handleURL:URL sourceApplication:sourceApplication annotation:nil];
 }
 
+- (NSString *)email {
+  return _email;
+}
+
 #pragma mark - GIDSignInDelegate methods
 
 - (void)signIn:(GIDSignIn *)signIn
@@ -158,6 +170,7 @@ static NSString *const kSignInWithGoogle = @"SignInWithGoogle";
     }
     return;
   }
+  _email = user.profile.email;
   UIActivityIndicatorView *activityView =
       [FUIAuthBaseViewController addActivityIndicator:_presentingViewController.view];
   [activityView startAnimating];

@@ -8,4 +8,3 @@ target 'FirebaseUI-demo-swift' do
   end
 
 end
-

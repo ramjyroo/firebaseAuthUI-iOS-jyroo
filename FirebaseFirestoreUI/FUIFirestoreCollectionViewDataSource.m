@@ -133,8 +133,14 @@
     [self.collectionView insertItemsAtIndexPaths:insertedIndexPaths];
 
   } completion:^(BOOL finished) {
-    NSLog(@"Updated with diff: %@", diff);
-    NSLog(@"Total: %ld", (long)_collection.count);
+    // Reload paths that have been moved.
+    NSMutableArray *movedIndexPaths =
+    [NSMutableArray arrayWithCapacity:diff.movedResultIndexes.count];
+    for (NSNumber *movedResultIndex in diff.movedResultIndexes) {
+      NSIndexPath *moved = [NSIndexPath indexPathForItem:movedResultIndex.integerValue inSection:0];
+      [movedIndexPaths addObject:moved];
+    }
+    [self.collectionView reloadItemsAtIndexPaths:movedIndexPaths];
   }];
 }
 
@@ -142,7 +148,8 @@
   if (self.queryErrorHandler != nil) {
     self.queryErrorHandler(error);
   } else {
-    NSLog(@"%@ Unhandled Firestore error: %@", self, error);
+    NSLog(@"%@ Unhandled Firestore error: %@. Set the queryErrorHandler property to debug.",
+          self, error);
   }
 }
 

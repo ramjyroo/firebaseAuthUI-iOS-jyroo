@@ -178,8 +178,10 @@ NS_ASSUME_NONNULL_BEGIN
       }
       return;
     }
-    [self.delegate.auth.currentUser reauthenticateWithCredential:credential
-                                                  completion:^(NSError *_Nullable reauthError) {
+    [self.delegate.auth.currentUser
+        reauthenticateAndRetrieveDataWithCredential:credential
+                                         completion:^(FIRAuthDataResult *_Nullable authResult,
+                                                      NSError *_Nullable reauthError) {
       [self.delegate decrementActivity];
       if (result) {
         result(self.delegate.auth.currentUser, reauthError);
@@ -205,9 +207,13 @@ NS_ASSUME_NONNULL_BEGIN
 
   [self.delegate incrementActivity];
 
+  if (self.delegate.auth.currentUser.email == nil) {
+    NSLog(@"FirebaseUI: Expected nonnull email during email/password reauthentication");
+    return;
+  }
   [self.delegate.auth signInWithEmail:self.delegate.auth.currentUser.email
                              password:password
-                           completion:^(FIRUser *_Nullable user, NSError *_Nullable error) {
+                           completion:^(FIRAuthDataResult *authResult, NSError *error) {
     [self.delegate decrementActivity];
 
     [self finishOperationWithError:error];

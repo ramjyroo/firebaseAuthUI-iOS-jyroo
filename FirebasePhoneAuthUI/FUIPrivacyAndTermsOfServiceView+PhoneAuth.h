@@ -14,18 +14,18 @@
 //  limitations under the License.
 //
 
-#import "FUIAppDelegate.h"
-@import Firebase;
+#import "FUIPrivacyAndTermsOfServiceView.h"
 
-@implementation FUIAppDelegate
+NS_ASSUME_NONNULL_BEGIN
 
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-  FIROptions *options = [[FIROptions alloc] initWithGoogleAppID:@"0:000000000000:ios:0000000000000000"
-                                                    GCMSenderID:@"testGCMSenderIDValue"];
-  [FIRApp configureWithOptions:options];
+@interface FUIPrivacyAndTermsOfServiceView (PhoneAuth)
 
-  return YES;
-}
-
+/** @fn useFullMessageWithSMSRateTerm
+    @brief Display Privacy and Terms of Service message, along with a note related to SMS rate for
+           phone authentication.
+ */
+- (void)useFullMessageWithSMSRateTerm;
 
 @end
+
+NS_ASSUME_NONNULL_END

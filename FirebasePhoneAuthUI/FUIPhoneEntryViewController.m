@@ -29,6 +29,8 @@
 #import "FUIPhoneAuth_Internal.h"
 #import "FUIPhoneNumber.h"
 #import "FUIPhoneVerificationViewController.h"
+#import "FUIPrivacyAndTermsOfServiceView+PhoneAuth.h"
+
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -67,7 +69,7 @@ static NSString *const kNextButtonAccessibilityID = @"NextButtonAccessibilityID"
   UITextField *_countryCodeField;
   FUICountryCodeInfo *_selectedCountryCode;
   __weak IBOutlet UITableView *_tableView;
-  __weak IBOutlet UITextView *_tosTextView;
+  __weak IBOutlet FUIPrivacyAndTermsOfServiceView *_tosView;
   FUICountryCodes *_countryCodes;
   FUIPhoneNumber *_phoneNumber;
 }
@@ -130,8 +132,8 @@ static NSString *const kNextButtonAccessibilityID = @"NextButtonAccessibilityID"
                                                               target:nil
                                                               action:nil];
   [self.navigationItem setBackBarButtonItem:backItem];
-  _tosTextView.text = [NSString stringWithFormat:FUIPhoneAuthLocalizedString(kPAStr_TermsSMS),
-                           FUIPhoneAuthLocalizedString(kPAStr_Verify)];
+  _tosView.authUI = self.authUI;
+  [_tosView useFullMessageWithSMSRateTerm];
 
   [self enableDynamicCellHeightForTableView:_tableView];
 }
@@ -140,11 +142,20 @@ static NSString *const kNextButtonAccessibilityID = @"NextButtonAccessibilityID"
   [super viewWillAppear:animated];
 
   if (self.navigationController.viewControllers.firstObject == self) {
-    UIBarButtonItem *cancelBarButton =
-        [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
-                                                      target:self
-                                                      action:@selector(cancelAuthorization)];
-    self.navigationItem.leftBarButtonItem = cancelBarButton;
+    if (self.authUI.providers.count != 1){
+      UIBarButtonItem *cancelBarButton =
+         [[UIBarButtonItem alloc] initWithTitle:FUILocalizedString(kStr_Back)
+                                       style:UIBarButtonItemStylePlain
+                                      target:self
+                                      action:@selector(cancelAuthorization)];
+      self.navigationItem.leftBarButtonItem = cancelBarButton;
+    } else if (!self.authUI.shouldHideCancelButton) {
+      UIBarButtonItem *cancelBarButton =
+          [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
+                                                        target:self
+                                                        action:@selector(cancelAuthorization)];
+      self.navigationItem.leftBarButtonItem = cancelBarButton;
+    }
     self.navigationItem.backBarButtonItem =
         [[UIBarButtonItem alloc] initWithTitle:FUILocalizedString(kStr_Back)
                                          style:UIBarButtonItemStylePlain
@@ -181,7 +192,7 @@ static NSString *const kNextButtonAccessibilityID = @"NextButtonAccessibilityID"
       self.navigationItem.rightBarButtonItem.enabled = YES;
 
       if (error) {
-        [_phoneNumberField becomeFirstResponder];
+        [self->_phoneNumberField becomeFirstResponder];
 
         UIAlertController *alertController = [FUIPhoneAuth alertControllerForError:error
                                                                      actionHandler:nil];
@@ -254,6 +265,9 @@ static NSString *const kNextButtonAccessibilityID = @"NextButtonAccessibilityID"
     _phoneNumberField.autocapitalizationType = UITextAutocapitalizationTypeNone;
     _phoneNumberField.returnKeyType = UIReturnKeyNext;
     _phoneNumberField.keyboardType = UIKeyboardTypeNumberPad;
+    if (@available(iOS 10.0, *)) {
+      _phoneNumberField.textContentType = UITextContentTypeTelephoneNumber;
+    }
     [_phoneNumberField becomeFirstResponder];
     if (_phoneNumber) {
       _phoneNumberField.text = _phoneNumber.rawPhoneNumber;

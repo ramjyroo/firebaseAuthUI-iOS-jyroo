@@ -23,6 +23,7 @@
 #import "FUICodeField.h"
 #import "FUIPhoneAuthStrings.h"
 #import "FUIPhoneAuth_Internal.h"
+#import "FUIPrivacyAndTermsOfServiceView+PhoneAuth.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -45,7 +46,7 @@ static NSString *const kLinkPlaceholderPattern = @"\\[([^\\]]+)\\]";
   __weak IBOutlet UIButton *_resendCodeButton;
   __weak IBOutlet UILabel *_actionDescriptionLabel;
   __weak IBOutlet UIButton *_phoneNumberButton;
-  __weak IBOutlet UITextView *_tosTextView;
+  __weak IBOutlet FUIPrivacyAndTermsOfServiceView *_tosView;
   __weak IBOutlet UIScrollView *_scrollView;
   NSString *_verificationID;
   NSTimer *_resendConfirmationCodeTimer;
@@ -100,7 +101,8 @@ static NSString *const kLinkPlaceholderPattern = @"\\[([^\\]]+)\\]";
   nextButtonItem.accessibilityIdentifier = kNextButtonAccessibilityID;
   self.navigationItem.rightBarButtonItem = nextButtonItem;
   self.navigationItem.rightBarButtonItem.enabled = NO;
-  _tosTextView.attributedText = [self accountCreationTOS];
+  _tosView.authUI = self.authUI;
+  [_tosView useFooterMessage];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -134,14 +136,14 @@ static NSString *const kLinkPlaceholderPattern = @"\\[([^\\]]+)\\]";
     // TODO: Remove temporary workaround when the issue is fixed in FirebaseAuth.
     dispatch_block_t completionBlock = ^() {
       [self decrementActivity];
-      _verificationID = verificationID;
-      [_codeField becomeFirstResponder];
+      self->_verificationID = verificationID;
+      [self->_codeField becomeFirstResponder];
 
       if (error) {
         UIAlertController *alertController = [FUIPhoneAuth alertControllerForError:error
                                                                      actionHandler:^{
-                                               [_codeField clearCodeInput];
-                                               [_codeField becomeFirstResponder];
+                                               [self->_codeField clearCodeInput];
+                                               [self->_codeField becomeFirstResponder];
                                              }];
         [self presentViewController:alertController animated:YES completion:nil];
         return;
@@ -149,7 +151,7 @@ static NSString *const kLinkPlaceholderPattern = @"\\[([^\\]]+)\\]";
 
       NSString *resultMessage =
           [NSString stringWithFormat:FUIPhoneAuthLocalizedString(kPAStr_ResendCodeResult),
-              _phoneNumber];
+              self->_phoneNumber];
       [self showAlertWithMessage:resultMessage];
     };
     if ([NSThread isMainThread]) {
@@ -187,13 +189,15 @@ static NSString *const kLinkPlaceholderPattern = @"\\[([^\\]]+)\\]";
                             result:^(FIRUser *_Nullable user, NSError *_Nullable error) {
     [self decrementActivity];
     self.navigationItem.rightBarButtonItem.enabled = YES;
-    if (!error || error.code == FUIAuthErrorCodeUserCancelledSignIn) {
+    if (!error ||
+        error.code == FUIAuthErrorCodeUserCancelledSignIn ||
+        error.code == FUIAuthErrorCodeMergeConflict) {
       [self.navigationController dismissViewControllerAnimated:YES completion:nil];
     } else {
       UIAlertController *alertController = [FUIPhoneAuth alertControllerForError:error
                                                                    actionHandler:^{
-                                             [_codeField clearCodeInput];
-                                             [_codeField becomeFirstResponder];
+                                             [self->_codeField clearCodeInput];
+                                             [self->_codeField becomeFirstResponder];
                                            }];
       [self presentViewController:alertController animated:YES completion:nil];
     }
@@ -268,7 +272,7 @@ static NSString *const kLinkPlaceholderPattern = @"\\[([^\\]]+)\\]";
 - (void)updateResendLabel {
   NSInteger minutes = (NSInteger)_resendConfirmationCodeSeconds / 60; // Integer type for truncation
   NSInteger seconds = (NSInteger)round(_resendConfirmationCodeSeconds) % 60;
-  NSString *formattedTime = [NSString stringWithFormat:@"%ld:%02ld", minutes, seconds];
+  NSString *formattedTime = [NSString stringWithFormat:@"%ld:%02ld", (long)minutes, (long)seconds];
 
   _resendConfirmationCodeTimerLabel.text =
       [NSString stringWithFormat:FUIPhoneAuthLocalizedString(kPAStr_ResendCodeTimer),
@@ -328,47 +332,6 @@ static NSString *const kLinkPlaceholderPattern = @"\\[([^\\]]+)\\]";
   _scrollView.scrollIndicatorInsets = contentInsets;
 
   [UIView commitAnimations];
-}
-
-- (NSAttributedString *)accountCreationTOS {
-
-  if (![FUIAuth defaultAuthUI].TOSURL) {
-    return nil;
-  }
-
-  NSAttributedString *currentAttributedString = _tosTextView.attributedText;
-  NSDictionary *currentAttributes =
-      [currentAttributedString attributesAtIndex:0
-                           longestEffectiveRange:nil
-                                         inRange:NSMakeRange(0, currentAttributedString.length)];
-
-  NSString *accountCreationTOS =
-      [NSString stringWithFormat:FUIPhoneAuthLocalizedString(kPAStr_TermsAccountCreation),
-          FUIPhoneAuthLocalizedString(kPAStr_Next)];
-  NSMutableAttributedString *attributedLinkText =
-      [[NSMutableAttributedString alloc] initWithString:accountCreationTOS
-                                             attributes:currentAttributes];
-
-  NSRegularExpression *linkRegex =
-      [NSRegularExpression regularExpressionWithPattern:kLinkPlaceholderPattern
-                                                options:0
-                                                  error:nil];
-  NSTextCheckingResult *placeholderMatch =
-      [linkRegex firstMatchInString:accountCreationTOS
-                            options:0
-                              range:NSMakeRange(0, [accountCreationTOS length])];
-  NSRange placeholderRange = placeholderMatch.range;
-  if (placeholderMatch) {
-    [attributedLinkText addAttribute:NSLinkAttributeName
-                               value:[FUIAuth defaultAuthUI].TOSURL
-                               range:placeholderRange];
-    NSRange lastOccurenceRange =
-        NSMakeRange(placeholderRange.location + placeholderRange.length - 1, 1);
-    NSRange firstOccurenceRange = NSMakeRange(placeholderRange.location, 1);
-    [attributedLinkText replaceCharactersInRange:lastOccurenceRange withString:@""];
-    [attributedLinkText replaceCharactersInRange:firstOccurenceRange withString:@""];
-  }
-  return attributedLinkText;
 }
 
 @end
